@@ -37,12 +37,12 @@ export default function Products() {
         <Table className="border">
           <TableHeader className="bg-[#F9F9F9]">
             <TableRow className="text-[18px]">
-              <TableHead>Invoc</TableHead>
+              <TableHead className="hidden md:table-cell">Invoc</TableHead>
               {/* <TableHead>Product</TableHead> */}
               <TableHead>Name</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>category</TableHead>
-              <TableHead className="">Date</TableHead>
+              <TableHead className="hidden md:table-cell">Date</TableHead>
               <TableHead className=" ">Action</TableHead>
             </TableRow>
           </TableHeader>
