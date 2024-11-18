@@ -54,7 +54,7 @@ export default function Products() {
         </Table>
       </div>
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-        <DialogContent className="md:w-[80%] w-full ">
+        <DialogContent className="md:w-[80%]  ">
           <DialogHeader>
             <DialogTitle  className="text-[30px] font-[600]">Create Meal</DialogTitle>
             <DialogDescription >
