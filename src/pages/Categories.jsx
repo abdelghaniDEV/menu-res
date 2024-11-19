@@ -30,7 +30,7 @@ export default function Categories() {
   return (
     <div>
       <div className="flex justify-between items-center">
-        <h1 className="text-[45px] font-[500] py-3">List Categories</h1>
+        <h1 className="text-[30px] md:text-[45px] font-[500] py-3">List Categories</h1>
         <Button
           className="border-black border-2"
           onClick={() => setOpenCreate(true)}
@@ -43,7 +43,7 @@ export default function Categories() {
         <Table className="border">
           <TableHeader className="bg-[#F9F9F9]">
             <TableRow className="text-[18px]">
-              <TableHead>Invoc</TableHead>
+              <TableHead>Id</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Meals</TableHead>
               <TableHead className="">Date</TableHead>
