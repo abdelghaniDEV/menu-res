@@ -10,6 +10,7 @@ import EditCategory from "./components/EditCategory";
 import EditProduct from "./components/EditProduct";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Categories from "./pages/Categories";
+import 'react-toastify/dist/ReactToastify.css';
 import { fetchProducts } from "./Redux/slices/products.slice";
 import { useDispatch } from "react-redux";
 import { fetchCategories } from "./Redux/slices/categories.slice";

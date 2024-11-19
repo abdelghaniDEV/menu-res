@@ -14,10 +14,14 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../Redux/slices/products.slice";
-import { toast } from "sonner"
+import { ToastContainer, toast } from 'react-toastify';
+
+import spinner from "../assets/tube-spinner (1).svg"
+
 
 export default function CreateProducts({ setOpenCreate }) {
   const [image, setImage] = useState("");
+  const [statusSubmit, setStatusSubmit] = useState("added");
   const categories = useSelector((state) => state.categories);
   const dispatch = useDispatch();
   const [data, setData] = useState({
@@ -35,7 +39,7 @@ export default function CreateProducts({ setOpenCreate }) {
     image: "",
   });
 
-  console.log(categories);
+
   const checkData = () => {
     let isValid = true;
 
@@ -132,6 +136,7 @@ export default function CreateProducts({ setOpenCreate }) {
       formData.append("image", data.image);
 
       try {
+        setStatusSubmit("loading")
         const response = await axios.post(
           `${import.meta.env.VITE_API_URL}/products`,
           formData,
@@ -142,17 +147,31 @@ export default function CreateProducts({ setOpenCreate }) {
           }
         );
         console.log("Upload successful:", response.data);
+        notify("success", "Meal added successfully");
         setOpenCreate(false);
+        setStatusSubmit("success")
         dispatch(fetchProducts());
-        toast("Meal added successfully")
       } catch (error) {
         console.log("Error uploading", error);
+        notify("error", error.message);
+        setStatusSubmit("added")
       }
+    }
+  };
+
+  const handleIconSubmit = () => {
+    if (statusSubmit === "loading") {
+      return <img src={spinner} className="w-5" />;
+    } else if (statusSubmit === "success") {
+      return <i className="bx bx-check text-[20px]"></i>;
+    } else if (statusSubmit === "added") {
+      return <i className="bx bx-plus text-[20px]"></i>;
     }
   };
 
   return (
     <div>
+     <ToastContainer />
       {/* Add form inputs for product data */}
       <div className="grid md:grid-cols-2 gap-10">
         <div className="flex flex-col gap-2">
@@ -249,6 +268,7 @@ export default function CreateProducts({ setOpenCreate }) {
               onClick={(e) => handelSubmitted(e)}
               className="bg-[#4CAF50] py-2 px-4 text-[18px] rounded-[5px] text-white hover:bg-[#45a049] transition-all duration-300 ease-in-out"
             >
+              {handleIconSubmit()}
               Create Meal
             </Button>
           </div>

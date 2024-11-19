@@ -47,8 +47,8 @@ export default function ProductCart({ product, index }) {
   };
   return (
     <TableRow className="md:text-[16px]  ">
-      <TableCell className="hidden">
-        <img src={product.image} className="w-8 h-8 rounded-full" />
+      <TableCell className="hidden md:table-cell border-r-[1px] w-10 h-10">
+        <img src={product.image} className=" rounded-full" />
       </TableCell>
       <TableCell className="flex gap-3 items-center">
         <span>{product.name}</span>
@@ -60,7 +60,7 @@ export default function ProductCart({ product, index }) {
         </span>
       </TableCell>
       <TableCell className="">{product.category?.name}</TableCell>
-      <TableCell className="hidden">{dataProduct}</TableCell>
+      <TableCell className="hidden md:table-cell">{dataProduct}</TableCell>
       <TableCell className="flex gap-3 items-center ">
         <button
           className="bg-slate-200 py-1 px-2 rounded-[4px] flex items-center"
@@ -73,12 +73,12 @@ export default function ProductCart({ product, index }) {
           className="bg-red-300 py-1 px-2 rounded-[4px] flex items-center"
           onClick={() => setOpenDelete(true)}
         >
-          <i className="bx bx-trash "></i>
+          <i className="bx bx-trash text-[20px] "></i>
           <span className="hidden">Delete</span>
         </button>
       </TableCell>
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent className="w-[80%]">
+        <DialogContent className="md:w-[80%] w-full py-4">
           <DialogHeader>
             <DialogTitle className="text-[30px] font-[600]">
               Edit Meal

@@ -6,18 +6,31 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
+import spinner from "../assets/tube-spinner (1).svg"
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [statusSubmit, setStatusSubmit] = useState("added");
   const navigate = useNavigate()
 
+  const handleIconSubmit = () => {
+    if (statusSubmit === "loading") {
+      return <img src={spinner} className="w-5" />;
+    } else if (statusSubmit === "success") {
+      return <i className="bx bx-check text-[20px]"></i>;
+    } else if (statusSubmit === "added") {
+      return <i className="bx bx-plus text-[20px]"></i>;
+    }
+  }
+      
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      setStatusSubmit("loading");
         const response = await axios.post(`${import.meta.env.VITE_API_URL}/users/login`, {
             email,
             password,
@@ -25,10 +38,12 @@ export default function Login() {
         console.log("login success", response.data);
         const token = response.data
         localStorage.setItem("tokenMenu", token);
+        setStatusSubmit("success");
         navigate("/dashboard")
     }catch (error) {
         setError("Invalid email or password");
         console.error("login error", error);
+        setStatusSubmit("added");
     }
   }
 
@@ -43,10 +58,6 @@ export default function Login() {
           <p className="md:text-[20px]">
             Hay, Entre your details to get sign in{" "}
           </p>
-          <div className="flex flex-col text-[15px] font-[600]">
-            <span>Email : public@gmail.com</span>
-            <span>Password : 12345678</span>
-          </div>
         </div>
         <form
             onSubmit={handleLogin}
@@ -85,6 +96,7 @@ export default function Login() {
             type="submit"
             className="bg-[#FEC887] text-black text-[15px] font-semibold  hover:bg-[] flex items-center gap-1 "
           >
+            {handleIconSubmit()}
             Sign in{" "}
           </Button>
         </form>

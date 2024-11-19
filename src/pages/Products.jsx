@@ -37,7 +37,7 @@ export default function Products() {
         <Table className="border">
           <TableHeader className="bg-[#F9F9F9]">
             <TableRow className="text-[18px]">
-              <TableHead className="hidden md:table-cell">Invoc</TableHead>
+              <TableHead className="hidden md:table-cell">image</TableHead>
               {/* <TableHead>Product</TableHead> */}
               <TableHead>Name</TableHead>
               <TableHead>Price</TableHead>
@@ -54,7 +54,7 @@ export default function Products() {
         </Table>
       </div>
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-        <DialogContent className="md:w-[80%]  ">
+        <DialogContent className="md:w-[80%] w-full py-4  ">
           <DialogHeader>
             <DialogTitle  className="text-[30px] font-[600]">Create Meal</DialogTitle>
             <DialogDescription >

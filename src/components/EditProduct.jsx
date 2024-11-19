@@ -15,8 +15,11 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import { toast } from "sonner"
 
+import spinner from "../assets/tube-spinner (1).svg"
+
 export default function EditProduct({ product , setOpenEdit }) {
   const categories = useSelector((state) => state.categories);
+  const [statusSubmit, setStatusSubmit] = useState("added");
   const [image, setImage] = useState("");
   const [prevUrl, setPrevUrl] = useState("");
   const [data, setData] = useState({
@@ -145,6 +148,7 @@ export default function EditProduct({ product , setOpenEdit }) {
 
       console.log(formData);
       try {
+        setStatusSubmit("loading")
         const response = await axios.patch(
           `${import.meta.env.VITE_API_URL}/products/${product._id}`,
           formData,{
@@ -154,11 +158,22 @@ export default function EditProduct({ product , setOpenEdit }) {
           }
         );
         console.log("update successful:", response.data);
+        setStatusSubmit("success")
         setOpenEdit(false);
         toast("Edit successful")
       } catch (error) {
         console.log("Error uploading", error);
       }
+    }
+  };
+
+  const handleIconSubmit = () => {
+    if (statusSubmit === "loading") {
+      return <img src={spinner} className="w-5" />;
+    } else if (statusSubmit === "success") {
+      return <i className="bx bx-check text-[20px]"></i>;
+    } else if (statusSubmit === "added") {
+      return <i className="bx bx-plus text-[20px]"></i>;
     }
   };
 
@@ -264,6 +279,7 @@ export default function EditProduct({ product , setOpenEdit }) {
               onClick={(e) => handelSubmitted(e)}
               className="bg-[#4CAF50] py-2 px-4 text-[18px] rounded-[5px] text-white hover:bg-[#45a049] transition-all duration-300 ease-in-out"
             >
+              {handleIconSubmit()}
               Save Change
             </Button>
           </div>
