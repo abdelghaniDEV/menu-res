@@ -25,8 +25,6 @@ export default function Categories() {
   const [openCreate, setOpenCreate] = useState(false);
   const categories = useSelector((state) => state.categories)
 
-
-
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -46,13 +44,13 @@ export default function Categories() {
               <TableHead>Id</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Meals</TableHead>
-              <TableHead className="">Date</TableHead>
+              <TableHead className=" ">Date</TableHead>
               <TableHead className=" ">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {categories.map((categ) => {
-              return <CategoryCart category={categ} />
+            {categories.map((categ , index) => {
+              return <CategoryCart category={categ} index={index} />
             })}
             
           </TableBody>

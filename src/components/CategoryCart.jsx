@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { fetchCategories } from "../Redux/slices/categories.slice";
 
-export default function CategoryCart({ category }) {
+export default function CategoryCart({ category , index }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
@@ -44,7 +44,7 @@ export default function CategoryCart({ category }) {
 
   return (
     <TableRow className="text-[18px] ">
-      <TableCell className="">#1000</TableCell>
+      <TableCell className="">#{index + 1}</TableCell>
       <TableCell className="">{category.name}</TableCell>
       <TableCell className="">4 Meal</TableCell>
       <TableCell className="">{dataCategory}</TableCell>
