@@ -60,8 +60,8 @@ const CreateCategory = ({ setOpenCreate }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto mt-8">
-      <h1 className="text-2xl font-bold mb-4">Add Category</h1>
+    <div className="md:max-w-lg mx-auto mt-8 ">
+      
       {message && (
         <div
           className={`p-2 mb-4 text-sm rounded ${

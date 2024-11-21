@@ -69,7 +69,7 @@ export default function CategoryCart({ category , index }) {
         </Button>
       </TableCell>
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent className="">
+        <DialogContent className="w-[90%]">
           <DialogHeader>
             <DialogTitle className="text-[30px] font-[600]">
               Edit Meal

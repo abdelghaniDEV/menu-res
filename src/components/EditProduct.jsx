@@ -104,7 +104,7 @@ const editProduct = ({ product , setOpenEdit }) => {
       )}
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 grid grid-cols-2 gap-[20px] items-start"
+        className="space-y-4 grid mt-[20px] md:mt-0 md:grid-cols-2 gap-[20px] items-start"
       >
         <div className="flex flex-col gap-3">
           <div>
@@ -140,7 +140,7 @@ const editProduct = ({ product , setOpenEdit }) => {
               className="w-full px-4 py-1 border rounded"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <label className="block text-sm font-medium mb-1">Category</label>
               <Select onValueChange={(e) => setCategoryId(e)}>

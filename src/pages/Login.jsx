@@ -35,7 +35,6 @@ export default function Login() {
             email,
             password,
         })
-        console.log("login success", response.data);
         const token = response.data
         localStorage.setItem("tokenMenu", token);
         setStatusSubmit("success");
@@ -89,7 +88,7 @@ export default function Login() {
               required
               className="focus:outline-[#f2b78d] "
             />
-            <i class="bx bx-show absolute right-2 text-[20px] top-[35px] cursor-pointer" onClick={() => setShowPassword(!showPassword)}></i>
+            <i className="bx bx-show absolute right-2 text-[20px] top-[35px] cursor-pointer" onClick={() => setShowPassword(!showPassword)}></i>
           </div>
 
           <Button
