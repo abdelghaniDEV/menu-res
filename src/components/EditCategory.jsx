@@ -1,96 +1,151 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import axios from "axios";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { fetchCategories } from "../Redux/slices/categories.slice";
+import { fetchProducts } from "../Redux/slices/products.slice";
 
-export default function EditCategory({category , setOpenEdit}) {
-  const [errorMsg, setErrorMsg] = useState("");
-  const [image, setImage] = useState("");
-  const [name , setName] = useState("")
-  const dispatch = useDispatch()
-  const categories = useSelector((state) => state.categories)
 
-  useEffect(() => {
-    setName(category.name)
-  },[category])
+const EditCategory = ({ category , setOpenEdit }) => {
+  const [name, setName] = useState("");
+const [subCategories, setSubCategories] = useState([""]);
+const [loading, setLoading] = useState(false);
+const [message, setMessage] = useState("");
 
-  const checkData = () => {
-    let isValid = true;
-    const inputName = document.getElementById("input-name");
-    // Add validation checks here
-    if(name === "" ){
-      setErrorMsg("name is required");
-      isValid = false;
+const dispatch = useDispatch()
 
-      inputName.classList.add("border-red-500");
-    }else if (categories.filter((category) => category.name === name)) {
-      setErrorMsg("Category name already exists");
-      isValid = false;
-      inputName.classList.add("border-red-500");
-    }else {
-      setErrorMsg("");
-      inputName.classList.remove("border-red-500");
-    }
-    return isValid;
-  }
+useEffect(() => {
+  setName(category.name);
+  setSubCategories(category.subCategories.map((sub) => sub.name));
+}, [category]);
 
-  // update categories
-  const handleUpdate = async () => {
-    checkData();
-    if (checkData()) {
-      return console.log("data is not valid");
-    }
-    // Update category in Redux state and API
+const handleSubCategoryChange = (index, value) => {
+  const updatedSubCategories = [...subCategories];
+  updatedSubCategories[index] = value;
+  setSubCategories(updatedSubCategories);
+};
+
+const addSubCategoryField = () => {
+  setSubCategories([...subCategories, ""]);
+};
+
+const removeSubCategoryField = (index) => {
+  const updatedSubCategories = subCategories.filter((_, i) => i !== index);
+  setSubCategories(updatedSubCategories);
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setMessage("");
+
+  try {
+    // إعداد البيانات لتحديث الفئة
     const updateData = {
-      name,
-    }
-    try {
-      const response = await axios.patch(
-        `${import.meta.env.VITE_API_URL}/categories/${category._id}`,
-        updateData,{
-          headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-              },
-        }
-      );
-      console.log("update category successfully", response.data);
-      dispatch(fetchCategories());
-      setOpenEdit(false);
-    } catch (error) {
-      console.error("Error updating category:", error);
-    }
-    // setOpenEdit(false);
-  };
+      name: name,
+      subCategories: subCategories
+        .filter((sub) => sub.trim() !== '') // إزالة الفئات الفرعية الفارغة
+        .map((sub) => ({ name: sub })),
+    };
+
+    // إرسال البيانات إلى الـ backend
+    const response = await axios.patch(
+      `${import.meta.env.VITE_API_URL}/${category._id}`,
+      updateData,
+      {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+        },
+      }
+    );
+
+    setMessage("Category updated successfully!");
+    dispatch(fetchCategories())
+    dispatch(fetchProducts())
+    setOpenEdit(false);
+    console.log("Category updated successfully!");
+  } catch (error) {
+    setMessage(
+      error.response?.data?.error ||
+        "An error occurred while updating the category."
+    );
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
   return (
-    <div className="relative">
-      <div className="flex  justify-between">
-        <div className="flex gap-2"></div>
-      </div>
-      {/* Add form inputs for product data */}
-      <div className="grid grid-cols-2 gap-10">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <label className="text-[15px] font-[500] text-[#474B4F]">
-              Category Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border h-10 text-[15px] bg-[#EEEEEE] rounded-[5px] outline-none pl-[16px] "
-              placeholder="Name of product"
-              id="input-name"
-            />
-            <span className="text-[14px] text-red-500" id="err-name"></span>
-          </div>
-          <div className="flex  gap-2">
-            <Button onClick={handleUpdate} className="bg-[#4CAF50] p-2 rounded-[5px] text-white hover:bg-[#45a049] transition-all duration-300 ease-in-out">
-              Create Category
-            </Button>
-          </div>
+    <div className="max-w-lg mx-auto mt-1">
+      {message && (
+        <div
+          className={`p-2 mb-4 text-sm rounded ${
+            message.includes("successfully")
+              ? "bg-green-200 text-green-800"
+              : "bg-red-200 text-red-800"
+          }`}
+        >
+          {message}
         </div>
-      </div>
+      )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Category Name
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="w-full px-4 py-2 border rounded"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Subcategories
+          </label>
+          {subCategories.map((subCategory, index) => (
+            <div key={index} className="flex items-center mb-2">
+              <input
+                type="text"
+                value={subCategory}
+                
+                onChange={(e) => handleSubCategoryChange(index, e.target.value)}
+                className="w-full px-4 py-2 border rounded"
+                placeholder={`Subcategory ${index + 1}`}
+              />
+              {subCategories.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => removeSubCategoryField(index)}
+                  className="ml-2 px-3 py-1 text-sm bg-red-500 text-white rounded"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addSubCategoryField}
+            className="mt-2 px-3 py-1 text-sm bg-blue-500 text-white rounded"
+          >
+            Add Subcategory
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+          {loading ? "Adding..." : "Add Category"}
+        </button>
+      </form>
     </div>
   );
-}
+};
+
+export default EditCategory;

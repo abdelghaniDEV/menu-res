@@ -59,7 +59,7 @@ export default function ProductCart({ product, index }) {
           {product.price}
         </span>
       </TableCell>
-      <TableCell className="">{product.category?.name}</TableCell>
+      <TableCell className="">{product.category?.name} / {product.subCategory}</TableCell>
       <TableCell className="hidden md:table-cell">{dataProduct}</TableCell>
       <TableCell className="flex gap-3 items-center ">
         <button
@@ -67,14 +67,14 @@ export default function ProductCart({ product, index }) {
           onClick={() => setOpenEdit(true)}
         >
           <i className="bx bx-edit text-[20px]"></i>
-          <span className="hidden">Edit</span>
+          <span className="hidden md:block">Edit</span>
         </button>
         <button
           className="bg-red-300 py-1 px-2 rounded-[4px] flex items-center"
           onClick={() => setOpenDelete(true)}
         >
           <i className="bx bx-trash text-[20px] "></i>
-          <span className="hidden">Delete</span>
+          <span className="hidden md:block">Delete</span>
         </button>
       </TableCell>
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
@@ -83,9 +83,9 @@ export default function ProductCart({ product, index }) {
             <DialogTitle className="text-[30px] font-[600]">
               Edit Meal
             </DialogTitle>
-            <DialogDescription>
+            <div>
               <EditProduct product={product} setOpenEdit={setOpenEdit} />
-            </DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -95,7 +95,7 @@ export default function ProductCart({ product, index }) {
             <DialogTitle className="text-[30px] font-[500]">
               Delete Meal
             </DialogTitle>
-            <DialogDescription className="text-[16px]">
+            <div className="text-[16px]">
               Are you sure you want to delete this meal?
               <div className="flex gap-3 pt-3">
                 <Button className=" bg-red-300" onClick={handelDelete}>
@@ -108,7 +108,7 @@ export default function ProductCart({ product, index }) {
                   Cencele
                 </Button>
               </div>
-            </DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Select,
   SelectContent,
@@ -10,329 +10,248 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Link } from "react-router-dom";
-import axios from "axios";
-import { useSelector } from "react-redux";
-import { toast } from "sonner"
+import { fetchProducts } from "../Redux/slices/products.slice";
+import { fetchCategories } from "../Redux/slices/categories.slice";
 
-import spinner from "../assets/tube-spinner (1).svg"
+const editProduct = ({ product , setOpenEdit }) => {
+  const [categories, setCategories] = useState([]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [subCategory, setSubCategory] = useState("");
+  const [image, setImage] = useState(null);
+  const [subCategories, setSubCategories] = useState([]);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [prevUrl, setPrevUrl] = useState();
 
-export default function EditProduct({ product , setOpenEdit }) {
-  const categories = useSelector((state) => state.categories);
-  const [statusSubmit, setStatusSubmit] = useState("added");
-  const [image, setImage] = useState("");
-  const [prevUrl, setPrevUrl] = useState("");
-  const [data, setData] = useState({
-    name: "",
-    price: "",
-    description: "",
-    category: "",
-    image: "",
-  });
-  const [errorMsg, setErrorMsg] = useState({
-    name: "",
-    price: "",
-    description: "",
-    category: "",
-    image: "",
-  });
+  const dispatch = useDispatch()
+  const categoriesRudex = useSelector((state) => state.categories);
 
-  console.log(product);
   useEffect(() => {
-    setData({
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      category: product?.category?._id,
-    });
+    setName(product.name);
+    setDescription(product.description);
+    setPrice(product.price);
+    setCategoryId(product.category?._id);
+    setSubCategory(product.subCategory);
     setPrevUrl(product.image);
   }, [product]);
+  // Fetch categories on component mount
+  useEffect(() => {
+    setCategories(categoriesRudex);
+  }, [categoriesRudex]);
 
-  const checkData = () => {
-    let isValid = true;
+  // Update subcategories when category changes
+  useEffect(() => {
+    const selectedCategory = categories.find((cat) => cat._id === categoryId);
+    setSubCategories(selectedCategory ? selectedCategory.subCategories : []);
+  }, [categoryId, categories]);
 
-    {
-      /* validate name */
-    }
-    if (data.name === "") {
-      const inputName = document.getElementById("input-name");
-      inputName.classList.add("border-red-500");
-      setErrorMsg((prev) => ({
-        ...prev,
-        name: "name is required",
-      }));
-      isValid = false;
-    } else {
-      const inputName = document.getElementById("input-name");
-      inputName.classList.remove("border-red-500");
-      setErrorMsg((prev) => ({
-        ...prev,
-        name: "",
-      }));
-    }
-
-    {
-      /* validate price */
-    }
-    if (data.price === "") {
-      const inputPrice = document.getElementById("input-price");
-      inputPrice.classList.add("border-red-500");
-      setErrorMsg((prev) => ({
-        ...prev,
-        price: "price is required",
-      }));
-      isValid = false;
-    } else {
-      const inputPrice = document.getElementById("input-price");
-      inputPrice.classList.remove("border-red-500");
-      setErrorMsg((prev) => ({
-        ...prev,
-        price: "",
-      }));
-    }
-
-    {
-      /* validate category */
-    }
-    if (data.category === "") {
-      setErrorMsg((prev) => ({
-        ...prev,
-        category: "category is required",
-      }));
-      isValid = false;
-    } else {
-      setErrorMsg((prev) => ({
-        ...prev,
-        category: "",
-      }));
-    }
-
-    {
-      /* validate image */
-    }
-    if (data.image === "") {
-      const inputImage = document.getElementById("input-image");
-      inputImage.classList.add("border-red-500");
-      setErrorMsg((prev) => ({
-        ...prev,
-        image: "image is required",
-      }));
-      isValid = false;
-    } else {
-      const inputImage = document.getElementById("input-image");
-      inputImage.classList.remove("border-red-500");
-      setErrorMsg((prev) => ({
-        ...prev,
-        image: "",
-      }));
-    }
-
-    return isValid;
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
   };
 
-  const handelSubmitted = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
-    checkData();
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("price", price);
+    formData.append("categoryId", categoryId);
+    formData.append("subCategory", subCategory);
+    if (image) formData.append("image", image);
 
-    if (checkData()) {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("price", data.price);
-      formData.append("description", data.description);
-      formData.append("category", data.category);
-
-      if (prevUrl !== product.image) {
-        formData.append("image", data.image);
-      }
-
-      console.log(formData);
-      try {
-        setStatusSubmit("loading")
-        const response = await axios.patch(
-          `${import.meta.env.VITE_API_URL}/products/${product._id}`,
-          formData,{
-            headers: {
-                Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-              },
-          }
-        );
-        console.log("update successful:", response.data);
-        setStatusSubmit("success")
-        setOpenEdit(false);
-        toast("Edit successful")
-      } catch (error) {
-        console.log("Error uploading", error);
-      }
-    }
-  };
-
-  const handleIconSubmit = () => {
-    if (statusSubmit === "loading") {
-      return <img src={spinner} className="w-5" />;
-    } else if (statusSubmit === "success") {
-      return <i className="bx bx-check text-[20px]"></i>;
-    } else if (statusSubmit === "added") {
-      return <i className="bx bx-plus text-[20px]"></i>;
+    try {
+      const response = await axios.patch(
+        `${import.meta.env.VITE_API_URL}/${product._id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" , 
+            Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
+          },
+        }
+      );
+      setMessage("Product added successfully!");
+      dispatch(fetchCategories())
+      dispatch(fetchProducts())
+      setOpenEdit(false)
+    } catch (error) {
+      setMessage(
+        error.response?.data?.error ||
+          "An error occurred while adding the product."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      {/* Add form inputs for product data */}
-      <div className="grid grid-cols-2 gap-10">
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-col gap-1">
-            <label className="text-[15px] font-[500] text-[#474B4F]">
-              Name Meal
+    <div className=" mt-1">
+      {message && (
+        <div
+          className={`p-2 mb-4 text-sm rounded ${
+            message.includes("successfully")
+              ? "bg-green-200 text-green-800"
+              : "bg-red-200 text-red-800"
+          }`}
+        >
+          {message}
+        </div>
+      )}
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 grid grid-cols-2 gap-[20px] items-start"
+      >
+        <div className="flex flex-col gap-3">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Product Name
             </label>
             <input
               type="text"
-              value={data.name}
-              onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  name: e.target.value,
-                }))
-              }
-              className="w-full border h-10 text-[15px] bg-[#EEEEEE] rounded-[5px] outline-none pl-[16px] "
-              placeholder="Name of product"
-              id="input-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full px-4 py-1 border rounded"
             />
-            <span className="text-[14px] text-red-500" id="err-name">
-              {errorMsg.name}
-            </span>
           </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-[15px] font-[500] text-[#474B4F]">
-              Price
-            </label>
-            <input
-              type="text"
-              value={data.price}
-              onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  price: e.target.value,
-                }))
-              }
-              className="w-[120px] border h-10 text-[15px] bg-[#EEEEEE] rounded-[5px] outline-none pl-[16px] "
-              placeholder="price"
-              id="input-price"
-            />
-            <span className="text-[14px] text-red-500" id="err-name">
-              {errorMsg.price}
-            </span>
-          </div>
-          <div className="flex flex-col gap-1">
-            <label className="text-[15px] font-[500] text-[#474B4F]">
+          <div>
+            <label className="block text-sm font-medium mb-1">
               Description
             </label>
             <textarea
-              type="text"
-              value={data.description}
-              onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-              className="w-full pt-2 border h-[100px] text-[15px] bg-[#EEEEEE] rounded-[5px] outline-none pl-[16px] "
-              placeholder="Name of product"
-              id="input-name"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              
+              className="w-full px-4 py-2 border rounded"
             />
-            <span className="text-[14px] text-red-500" id="err-name">
-              {errorMsg.description}
-            </span>
           </div>
           <div>
-            <Select
-              onValueChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  category: e,
-                }))
-              }
-            >
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select a fruit" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Categories</SelectLabel>
-                  {categories.map((cate) => {
-                    return (
-                      <SelectItem key={cate._id} value={cate._id}>
-                        {cate.name}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <span className="text-[14px] text-red-500" id="err-name">
-              {errorMsg.category}
-            </span>
+            <label className="block text-sm font-medium mb-1">Price</label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              required
+              className="w-full px-4 py-1 border rounded"
+            />
           </div>
-          <div className="flex  gap-2">
-            <Button
-              onClick={(e) => handelSubmitted(e)}
-              className="bg-[#4CAF50] py-2 px-4 text-[18px] rounded-[5px] text-white hover:bg-[#45a049] transition-all duration-300 ease-in-out"
-            >
-              {handleIconSubmit()}
-              Save Change
-            </Button>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="block text-sm font-medium mb-1">Category</label>
+              <Select onValueChange={(e) => setCategoryId(e)}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="selecte a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Categories</SelectLabel>
+                    {categories.map((cate) => {
+                      return (
+                        <SelectItem key={cate._id} value={cate._id}>
+                          {cate.name}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <label className="block text-sm font-medium mb-1">
+                Subcategory
+              </label>
+              <Select onValueChange={(e) => setSubCategory(e)}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue
+                    placeholder={
+                      subCategory ? subCategory : "select a sub category"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Subcategory</SelectLabel>
+                    {subCategories.map((cate) => {
+                      return (
+                        <SelectItem key={cate._id} value={cate.name}>
+                          {cate.name}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-        <div className="bg-[#F9F9F9] p-5 rounded-[10px] h-[250px] ">
-          <h1 className=" text-[20px] font-[600] mb-3">upload images</h1>
-          <div className="flex items-center gap-3">
-            <div>
-              <label
-                id="input-image"
-                htmlFor="dropzone-file"
-                className="flex flex-col items-center justify-center w-[150px] border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-[#EEEEEE]  dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-              >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <i className="bx bx-cloud-upload text-[#F5CAAB] text-[40px]"></i>
-                  <p>Upload</p>
+        <div className="flex flex-col gap-3">
+          <div>
+            {/* <label className="block text-sm font-medium mb-1">Image</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              required
+              className="w-full px-4 py-2 border rounded"
+            /> */}
+
+            <div className="bg-[#F9F9F9] p-5 rounded-[10px] h-[250px] ">
+              <h1 className=" text-[20px] font-[600] mb-3">upload images</h1>
+              <div className="flex items-center gap-3">
+                <div>
+                  <label
+                    id="input-image"
+                    htmlFor="dropzone-file"
+                    className="flex flex-col items-center justify-center w-[150px] border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-[#EEEEEE]  dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <i className="bx bx-cloud-upload text-[#F5CAAB] text-[40px]"></i>
+                      <p>Upload</p>
+                    </div>
+                    <input
+                      id="dropzone-file"
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                  {/* <span className="text-[14px] text-red-500" id="err-image">
+                    {errorMsg.image}
+                  </span> */}
                 </div>
-                <input
-                  id="dropzone-file"
-                  type="file"
-                  multiple
-                  className="hidden"
-                  onChange={(e) => {
-                    setData((prev) => ({
-                      ...prev,
-                      image: e.target.files[0],
-                    }));
-                    setPrevUrl("");
-                  }}
-                />
-              </label>
-              <span className="text-[14px] text-red-500" id="err-image">
-                {errorMsg.image}
-              </span>
-            </div>
-            <div>
-              <div className=" border-2 border-[#F5CAAB] rounded-[10px] p-1 ">
-                <img
-                  src={data.image ? URL.createObjectURL(data.image) : prevUrl}
-                  className="h-[100px] w-full cursor-pointer"
-                  onClick={() => {
-                    setData((prev) => ({
-                      ...prev,
-                      image: "",
-                    }));
-                    setPrevUrl("");
-                  }}
-                />
+                <div>
+                  <div className=" border-2 border-[#F5CAAB] rounded-[10px] p-1 ">
+                    <img
+                      src={image ? URL.createObjectURL(image) : prevUrl}
+                      className="h-[100px] w-full cursor-pointer"
+                      onClick={() =>{
+                        setImage(null)
+                        setPrevUrl("")
+                      }}
+
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            {loading ? "Adding..." : "Edit Product"}
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
-}
+};
+
+export default editProduct;

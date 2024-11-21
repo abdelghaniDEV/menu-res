@@ -33,7 +33,7 @@ export default function Categories() {
           className="border-black border-2"
           onClick={() => setOpenCreate(true)}
         >
-          <i class="bx bx-plus text-[20px]"></i>
+          <i className="bx bx-plus text-[20px]"></i>
           <span>Add Category</span>
         </Button>
       </div>
@@ -50,7 +50,7 @@ export default function Categories() {
           </TableHeader>
           <TableBody>
             {categories.map((categ , index) => {
-              return <CategoryCart category={categ} index={index} />
+              return <CategoryCart category={categ} index={index} key={categ._id} />
             })}
             
           </TableBody>
@@ -60,9 +60,9 @@ export default function Categories() {
         <DialogContent className="]">
           <DialogHeader>
             <DialogTitle  className="text-[30px] font-[600]">Create Category</DialogTitle>
-            <DialogDescription >
+            <div >
                <CreateCategory setOpenCreate={setOpenCreate} />
-            </DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>

@@ -29,7 +29,7 @@ export default function Products() {
       <div className="flex justify-between items-center">
         <h1 className="text-[30px] md:text-[45px] font-[500] py-3">List Meals</h1>
         <Button className="border-black border-2" onClick={() => setOpenCreate(true)}>
-          <i class="bx bx-plus text-[20px]"></i>
+          <i className="bx bx-plus text-[20px]"></i>
           <span className="hidden md:block">Add Meal</span>
         </Button>
       </div>
@@ -57,9 +57,9 @@ export default function Products() {
         <DialogContent className="md:w-[80%] w-full py-4  ">
           <DialogHeader>
             <DialogTitle  className="text-[30px] font-[600]">Create Meal</DialogTitle>
-            <DialogDescription >
+            <div >
                <CreateProducts setOpenCreate={setOpenCreate} />
-            </DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>

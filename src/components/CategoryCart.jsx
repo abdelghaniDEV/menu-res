@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
@@ -14,13 +14,18 @@ import EditCategory from "./EditCategory";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { fetchCategories } from "../Redux/slices/categories.slice";
+import { toast } from "sonner"
 
 export default function CategoryCart({ category , index }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const dispatch = useDispatch();
+  // const [filterByCategory , setFilterByCategory] = useState([]);
+  const products = useSelector((state) => state.products)
 
   const dataCategory = new Date(category.createdAt).toDateString();
+  
+
 
   const handleDelete = async () => {
     // Delete category from Redux state and API
@@ -35,6 +40,7 @@ export default function CategoryCart({ category , index }) {
       );
       console.log("delete category successfully", response.data);
       dispatch(fetchCategories());
+      toast("Delete successfully")
       setOpenDelete(false);
     } catch (error) {
       console.error("Error deleting category:", error);
@@ -42,11 +48,13 @@ export default function CategoryCart({ category , index }) {
     // setOpenDelete(false);
   };
 
+
+
   return (
     <TableRow className="text-[18px] ">
       <TableCell className="">#{index + 1}</TableCell>
-      <TableCell className="">{category.name}</TableCell>
-      <TableCell className="">4 Meal</TableCell>
+      <TableCell className="">{category?.name}</TableCell>
+      <TableCell className=""> Meal</TableCell>
       <TableCell className="">{dataCategory}</TableCell>
       <TableCell className="flex gap-3 ">
         <Button className="bg-slate-200" onClick={() => setOpenEdit(true)}>
@@ -66,9 +74,9 @@ export default function CategoryCart({ category , index }) {
             <DialogTitle className="text-[30px] font-[600]">
               Edit Meal
             </DialogTitle>
-            <DialogDescription>
+            <div>
               <EditCategory category={category} setOpenEdit={setOpenEdit} />
-            </DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -78,7 +86,7 @@ export default function CategoryCart({ category , index }) {
             <DialogTitle className="text-[30px] font-[500]">
               Delete category
             </DialogTitle>
-            <DialogDescription className="text-[16px]">
+            <div className="text-[16px]">
               Are you sure you want to delete this meal?
               <div className="flex gap-3 pt-3">
                 <Button className=" bg-red-300" onClick={handleDelete}>
@@ -91,7 +99,7 @@ export default function CategoryCart({ category , index }) {
                   Cencele
                 </Button>
               </div>
-            </DialogDescription>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>

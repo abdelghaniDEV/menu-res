@@ -18,7 +18,6 @@ import Login from "./pages/Login";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("tokenMenu");
-  console.log(token)
   return token ? children : <Navigate to="/login" />
 };
 
